@@ -8,6 +8,7 @@
 #include "assembler.h"
 #include "processor.h"
 #include "processor_data.h"
+
 int main() {
 	logger_initialize_stream(nullptr);
 	error_code error = 0;
@@ -26,13 +27,11 @@ int main() {
 
 	FILE* output_file = fopen("output", "w");
 	processor_data_t processor_data = {};
-	processor_data_init(&processor_data, "num_commands");
-	LOGGER_DEBUG("SIZE: %lu, STACK_CAPACITY: %lu, DATA: %p", processor_data.stack->size, processor_data.stack->capacity, processor_data.stack->data);
-	stack_dumb(processor_data.stack);
-	LOGGER_DEBUG("???");
+	stack_t stack = {};
+	processor_data_init(&processor_data, "num_commands", &stack);
 	error |= execution(output_file, &processor_data);
-
 	error |= processor_data_dest(&processor_data);
+	RETURN_IF_ERROR((int)error);
 	fclose(output_file);
 	return 0;
 }

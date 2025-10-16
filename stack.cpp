@@ -6,6 +6,8 @@
 
 #include <string.h>
 
+//==============================================================================
+
 static const int   MIN_STACK_SIZE   = 128;
 static const int   POISON_VALUE     = 0xEBA1DEDA; //0xCEBAEBA1DEDA
 static const float REDUCTION_FACTOR = 4; // float
@@ -76,9 +78,6 @@ error_code stack_dest(stack_t* stack) {
 	HARD_ASSERT(stack != nullptr, "Stack is nullptr");
 	ON_DEBUG(HARD_ASSERT(stack->is_constructed, "Stack is not constructed");)
 
-	ON_DEBUG(
-		stack_dumb(stack);
-	)
 	free(stack->original_ptr);
 	stack->is_constructed = false;
 	return 0;
@@ -90,7 +89,7 @@ error_code stack_push(stack_t* stack, st_type elem) {
 	HARD_ASSERT(stack != nullptr, "Stack is nullptr");
 
 	error_code error = 0;
-	LOGGER_WARNING("STACK_SIZE: %lu, STACK_CAPACITY: %lu, STACK_DATA: %p\n STACK_FIRST_ELEM:", stack->size, stack->capacity, stack->data);
+
 	ON_DEBUG(
 		error = stack_verify(stack);
 		RETURN_IF_ERROR(error);
@@ -113,6 +112,51 @@ error_code stack_push(stack_t* stack, st_type elem) {
 
 	return error;
 }
+
+st_type stack_pop(stack_t* stack, error_code* error_return) { //Лучше возвращать ошибку или значение? //D c++ разделено на 2 функциии 1 вычитает значение другая возвращает (для души)(какая=то хуйня я не помню)
+	LOGGER_DEBUG("Pop stared");
+
+	HARD_ASSERT(stack != nullptr, "Stack is nullptr");
+	HARD_ASSERT(error_return != nullptr, "Stack for return is nullptr");
+	ON_DEBUG(HARD_ASSERT(stack->is_constructed, "Stack is not constructed");)
+
+	error_code error = 0;
+	ON_DEBUG(
+		error = stack_verify(stack);
+		if(error != 0) {
+			LOGGER_ERROR("Error code: %lu", error);
+			*error_return = error;
+			return -1; 
+		} else if(stack->size == 0) {
+			error |= SMALL_SIZE_ERROR;
+			LOGGER_ERROR("Error code: %lu", error);
+			*error_return = error;
+			return -1;
+		}
+	)
+ 	st_type popped_elem = stack->data[stack->size - 1];
+	stack->data[stack->size - 1] = POISON_VALUE;
+	stack->size--;
+
+	ON_HASH_DEBUG(
+		stack->ver_info.hash = stack_get_hash(stack, &error);
+	)
+
+	error = normalize_size(stack);
+
+	if(error != 0) {
+		LOGGER_ERROR("Error code: %lu", error);
+		*error_return = error;
+		return -1;
+	}
+
+	ON_DEBUG(
+		error = stack_verify(stack);
+	)
+	return popped_elem;
+}
+
+//------------------------------------------------------------------------------
 
 static error_code normalize_size(stack_t* stack) {
 	LOGGER_DEBUG("Normalize_size started");
@@ -210,48 +254,6 @@ static error_code stack_recalloc(stack_t* stack, size_t new_capacity) {
     return error;
 }
 
-st_type stack_pop(stack_t* stack, error_code* error_return) { //Лучше возвращать ошибку или значение? //D c++ разделено на 2 функциии 1 вычитает значение другая возвращает (для души)(какая=то хуйня я не помню)
-	LOGGER_DEBUG("Pop stared");
-
-	HARD_ASSERT(stack != nullptr, "Stack is nullptr");
-	HARD_ASSERT(error_return != nullptr, "Stack for return is nullptr");
-	ON_DEBUG(HARD_ASSERT(stack->is_constructed, "Stack is not constructed");)
-
-	error_code error = 0;
-	ON_DEBUG(
-		error = stack_verify(stack);
-		if(error != 0) {
-			LOGGER_ERROR("Error code: %lu", error);
-			*error_return = error;
-			return -1; 
-		} else if(stack->size == 0) {
-			error |= SMALL_SIZE_ERROR;
-			LOGGER_ERROR("Error code: %lu", error);
-			*error_return = error;
-			return -1;
-		}
-	)
- 	st_type popped_elem = stack->data[stack->size - 1];
-	stack->data[stack->size - 1] = POISON_VALUE;
-	stack->size--;
-
-	ON_HASH_DEBUG(
-		stack->ver_info.hash = stack_get_hash(stack, &error);
-	)
-
-	error = normalize_size(stack);
-
-	if(error != 0) {
-		LOGGER_ERROR("Error code: %lu", error);
-		*error_return = error;
-		return -1;
-	}
-
-	ON_DEBUG(
-		error = stack_verify(stack);
-	)
-	return popped_elem;
-}
 //a0 + a1 * a2 + a3 * a4
 //Канарейка в структуры
 //Tckb 
@@ -261,6 +263,8 @@ st_type stack_pop(stack_t* stack, error_code* error_return) { //Лучше во�
 
 //Почему с большой буквы ищет хрень в онегине
 //Почему нельзя ifdef в define СПРОСИТЬ
+//------------------------------------------------------------------------------
+
 error_code stack_verify(const stack_t* stack) {
 	//LOGGER_DEBUG("stack_verify started");
 	error_code error = 0;

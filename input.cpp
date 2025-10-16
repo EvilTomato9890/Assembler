@@ -15,6 +15,8 @@ static size_t count_string_and_prepare_buffer(char* buff);
 static size_t get_command_from_buffer(command_data* command_ptr, char** buff);
 static error_type get_file_size(FILE* curr_file, long* length); 
 
+//==============================================================================
+
 FILE* open_file(char** file_name_return) {
     printf("Введите имя файла:\n");
     char file_name[100] = {};
@@ -32,16 +34,6 @@ FILE* open_file(char** file_name_return) {
     }
     *file_name_return = file_name;
     return input_file;
-}
-
-error_type text_dest(text_data* text) {
-    HARD_ASSERT(text != nullptr, "text is nullptr");
-    LOGGER_DEBUG("text_dest started");
-
-    free(text->commands);
-    text->commands = NULL;
-    free(text->commands_container);
-    return NO_ERROR;
 }
 
 /*
@@ -85,6 +77,8 @@ error_type read_file_into_buffer(FILE* curr_file, char** buffer_return) {
     *buffer_return = buffer;
     return error;
 }
+
+//==============================================================================
 
 static error_type get_file_size(FILE* curr_file, long* length) {
     LOGGER_DEBUG("get_file_size started");
@@ -145,9 +139,13 @@ static size_t get_command_from_buffer(command_data* command_ptr, char** buff) {
     return (size_t)(*buff - command_ptr->str - 1);
 }
 
+//==============================================================================
+
 error_type text_init(char* buff, text_data* text_return) {
     LOGGER_DEBUG("text_init started");
-    if (buff == nullptr) LOGGER_WARNING("Buff is nullptr");
+    
+    HARD_ASSERT(buff != nullptr, "buff is nullptr");
+    HARD_ASSERT(text_return != nullptr, "text_return is nullptr");
     
     error_type error = NO_ERROR;
 
@@ -172,4 +170,14 @@ error_type text_init(char* buff, text_data* text_return) {
     text_return->commands_container = arr_struct_addreses;
 
     return error;
+}
+
+error_type text_dest(text_data* text) {
+    HARD_ASSERT(text != nullptr, "text is nullptr");
+    LOGGER_DEBUG("text_dest started");
+
+    free(text->commands);
+    text->commands = NULL;
+    free(text->commands_container);
+    return NO_ERROR;
 }

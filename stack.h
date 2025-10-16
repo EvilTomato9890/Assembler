@@ -5,6 +5,7 @@
 #include "limits.h"
 #include <stdlib.h>
 
+//==============================================================================
 
 #ifdef HASH_DEBUG
 	#define VERIFY_DEBUG
@@ -28,6 +29,7 @@
 
 #define VER_INIT ver_data{__LINE__, 0, "int", "stack", __FILE__, __func__, "Init"}
 
+//==============================================================================
 
 typedef int st_type;
 
@@ -63,6 +65,8 @@ struct stack_t {
 	)
 };
 
+//==============================================================================
+
 error_code stack_init(stack_t* stack_return, size_t capacity ON_DEBUG(, ver_data ver_info));
 
 error_code stack_dest(stack_t* stack);
@@ -73,4 +77,5 @@ error_code stack_push(stack_t* stack, st_type elem);
 
 st_type stack_pop(stack_t* stack, error_code* error_return); //Лучше возвращать ошибку или значение?
 
+//==============================================================================
 #endif

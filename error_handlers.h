@@ -26,6 +26,8 @@ enum error_type {
 
 typedef long error_code;
 
+//==============================================================================
+
 #define RETURN_IF_ERROR(error_, ...) 					\
 	do {											 	\
 		if((error_) != 0) { 							\

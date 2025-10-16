@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 
+//==============================================================================
+
 struct command_data {
     char* str;
     size_t len;
@@ -17,6 +19,9 @@ struct text_data {
     command_data* commands_container;
     size_t str_num;
 };
+
+//==============================================================================
+
 //error_code text_verify(text_data* text);
 error_type read_file_into_buffer(FILE* file_name, char** buffer_return); 
 FILE* open_file(char** file_name_return);

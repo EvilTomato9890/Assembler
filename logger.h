@@ -5,6 +5,8 @@
 
 #include "stack.h"
 
+//==============================================================================
+
 enum logger_mode_type {
     LOGGER_MODE_DEBUG = 0,
     LOGGER_MODE_INFO  = 1,
@@ -17,20 +19,27 @@ enum logger_output_type {
     OWNED_FILE = 1
 };
 
+//==============================================================================
+
 const char* logger_mode_string(const logger_mode_type type);
 void logger_time_string(char *buff, size_t n);
 const char* logger_color_on(const logger_mode_type mode);
+
+//------------------------------------------------------------------------------
 
 void logger_initialize_stream(FILE *stream); /* NULL => stderr */
 int  logger_initialize_file(const char *path); 
 void logger_close();
 
+//------------------------------------------------------------------------------
 
 void logger_log_message(logger_mode_type mode,
                         const char *file, int line,
                         const char *format, ...);
 
 void stack_dumb(const stack_t* stack);
+
+//==============================================================================
 
 #ifdef LOGGER_ALL
 #define LOGGER_DEBUG(...)   logger_log_message(LOGGER_MODE_DEBUG,   __FILE__, __LINE__, __VA_ARGS__)

@@ -5,13 +5,13 @@
 #include "colors.h"
 #include "logger.h"
 
-
+//==============================================================================
 
 static FILE *output_stream = NULL;
 static logger_output_type output_type = EXTERNAL_STREAM;
 static int color_enabled = 1;
 
-
+//==============================================================================
 
 #if defined(WinV)
     #define localtime_r(T,Tm) (localtime_s(Tm,T) ? NULL : Tm)
@@ -100,6 +100,8 @@ void logger_log_message(const logger_mode_type mode,
     fputc('\n', output_stream);
 }
 
+//------------------------------------------------------------------------------
+
 ON_DEBUG(
 void stack_dumb(const stack_t* stack) {
     HARD_ASSERT(stack != nullptr, "Stack is nullptr");
@@ -109,9 +111,6 @@ void stack_dumb(const stack_t* stack) {
         output_stream = stderr;
     }
     if(output_type == EXTERNAL_STREAM) {
-        LOGGER_ERROR("STACK_SIZE: %lu", stack->size);
-        LOGGER_ERROR("STACK_SIZE: %lu", stack->size);
-
         fprintf(output_stream,                  
             "Stack_t<%s> [%p] \"%s\" from %s at %s:%d\n"
             "{\n"
@@ -124,8 +123,6 @@ void stack_dumb(const stack_t* stack) {
         ON_CANARY_DEBUG(
             fprintf(output_stream, "  CANARY [-1] = %d\n", stack->data[-1]);
         )
-        LOGGER_ERROR("STACK_SIZE: %lu", stack->size);
-        LOGGER_ERROR("STACK_SIZE: %lu", stack->size);
 
         for(size_t i = 0; i < stack->capacity; i++) {
             if(i < stack->size)
