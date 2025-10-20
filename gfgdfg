@@ -1,0 +1,12 @@
+.PHONY: all assembler processor clean
+all:
+	$(MAKE) -C Assembler-New_structure all
+
+assembler:
+	$(MAKE) -C Assembler-New_structure assembler
+
+processor:
+	$(MAKE) -C Assembler-New_structure processor
+
+clean:
+	$(MAKE) -C Assembler-New_structure clean

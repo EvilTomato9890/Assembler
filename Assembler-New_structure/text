@@ -1,0 +1,21 @@
+.PHONY: all common assembler processor clean run-assembler run-processor
+
+all: assembler processor
+
+assembler:
+	$(MAKE) -C compiler all
+
+processor:
+	$(MAKE) -C cpu all
+
+clean:
+	$(MAKE) -C compiler clean || true
+	$(MAKE) -C cpu clean || true
+	$(MAKE) -C common clean || true
+	@rm -rf build
+
+run-assembler:
+	$(MAKE) -C compiler run
+
+run-processor:
+	$(MAKE) -C cpu run
